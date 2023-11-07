@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Portfolio" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="shortcut icon" href="#">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://kit.fontawesome.com/fa62c117c7.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="styles.css" />
+    <title>M&E Controls : Time Logs : Register</title>
+
+
+    <script type="module">
+
+      console.log("HERE!!");
+
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-analytics.js";
+      import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js"
+
+      import { ref, set } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js"
+      import { child, get } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js"
+      import { onValue } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js"
+      //import { getAuth, createUserWithEmailAndPassword } from "firebase/compat/auth";
+      import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.6.8/firebase-auth.js';
+
+      const firebaseConfig = {
+
+        apiKey: "AIzaSyB1aP2HtjGQv4UXKj94fSciGaWayaEivvo",
+        authDomain: "mandetimebook.firebaseapp.com",
+        databaseURL: "https://mandetimebook-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "mandetimebook",
+        storageBucket: "mandetimebook.appspot.com",
+        messagingSenderId: "137699696644",
+        appId: "1:137699696644:web:46f922af06a86db994d551",
+        measurementId: "G-HQ0J2H2P8L"
+      };
+
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      // Get a reference to the database service
+      const database = getDatabase(app);
+      const auth = getAuth(app);
+      const db = getDatabase();
+      const dbRef = ref(getDatabase());
+
+      console.log("HERE!!")
+
+      
+
+      // send the inputted column name to the refrenced db
+      // create a oninput event listener function
+      function enterName(){
+
+        
+
+        
+        var name = fullName.value;
+        var email = emailInput.value;
+        var password = passwordInput.value;
+
+        
+        createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
+          
+          // Signed in 
+          const user = userCredential.user;
+          const { uid, displayName, email } = user; // Destructure user object
+          console.log(uid);
+
+          // Store user data in Firebase Realtime Database
+          const usersRef = ref(db, 'users');
+          
+          set(ref(db, 'Users/'+uid), {
+            name : name,
+            email: email,
+            uid: uid
+          }).then(() => {
+            console.log('User data stored in the database');
+            alert("Registration SUCCESSFULLY processed");
+            window.location.href = "file:///Users/jonnylogue/Desktop/MandETime/public/launchPad.html";
+        }).catch((error) => {
+            console.error('Error storing user data:', error);
+            const errorCode = error.code;
+            const errorMessage = error.message;
+
+            console.error(errorCode, errorMessage);
+
+            if (errorCode === 'auth/email-already-in-use' || errorCode === 'EMAIL_EXISTS') {
+              // Handle the case when the email already exists
+
+              console.log(errorCode);
+              console.log(errorMessage)
+            }
+          });
+    
+        }).catch((error) => {
+            
+            const errorCode = error.code;
+            const errorMessage = error.message;
+
+            if (errorCode === 'auth/email-already-in-use') {
+              // Handle the case when the email already exists
+              alert("Email Address Already in Use");
+            }
+            if (errorCode === 'auth/invalid-email') {
+              // Handle the case when the email already exists
+              alert("Invalid Email - Please Try Again");
+            }
+            if (errorCode === 'auth/network-request-failed') {
+              // Handle the case when the email already exists
+              alert("Network Request Failed - Please Try Again Or Check Connection");
+            }
+            if (errorCode === 'auth/weak-password') {
+              // Handle the case when the email already exists
+              alert("Weak Password - Suggest using a stronger password");
+            }
+
+
+
+
+            console.log(errorCode);
+            console.log(errorMessage)
+    
+        });
+      };
+
+      
+
+
+      function msg() {
+        alert("Registration SUCCESSFULLY processed - Continue to Login");
+
+      };
+      function msg2() {
+        alert("Registration UN-SUCCESSFULLY processed - Contact M&E Controls Ltd");
+
+      };
+      function msg3() {
+        alert("System data will be updated. Check for change in Last Update TimeStamp value.\nManual data update button will only work once every 1 minute.");
+
+      };
+
+      function toggle(){
+        // store the name var to 1
+        name = 1;
+        // write the "1" value to the database
+        set(ref(db, 'Buttons/Execute'), {
+          value : name
+        });
+        // start a countdown timer of 7 seconds before resetting the run state back to 0
+        setTimeout(() => { name = 0;
+          set(ref(db, 'Buttons/Execute'), {
+          value : name
+        }); }, 1000);
+
+      };
+
+      function toggleSMS(){
+
+        // store the name var to 1
+        name = 1;
+        // write the "1" value to the database
+        set(ref(db, 'Buttons/KillSw'), {
+          value : name
+        });
+        // start a countdown timer of 7 seconds before resetting the run state back to 0
+        setTimeout(() => { name = 0;
+          set(ref(db, 'Buttons/KillSw'), {
+          value : name
+        }); }, 1000);
+          
+
+      }
+
+
+      function dataToggle(){
+
+        // store the name var to 1
+        name = 1;
+        // write the "1" value to the database
+        set(ref(db, 'Buttons/dataToggle'), {
+          value : name
+        });
+        // start a countdown timer of 7 seconds before resetting the run state back to 0
+        setTimeout(() => { name = 0;
+          set(ref(db, 'Buttons/dataToggle'), {
+          value : name
+        }); }, 1000);
+          
+
+      }
+
+      
+
+      function getData(refString){
+        const Ref = ref(db, refString);
+        onValue(Ref, (snapshot) => {
+          var data = snapshot.val();
+          console.log(snapshot.val());
+          return data; 
+        });
+      }
+
+      
+      
+      
+      btn1.addEventListener('click', function() {
+          enterName();
+          
+      });
+
+      
+
+    
+    </script>
+
+
+
+
+  </head>
+
+  
+
+  <body class="light" id="top">
+    <header class="header center">
+      
+
+      <nav class="nav center">
+        
+
+        
+
+        <button
+          type="button"
+          aria-label="toggle navigation"
+          class="btn btn--icon nav__hamburger"
+        >
+          <i aria-hidden="true" class="fas fa-bars"></i>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- About -->
+      <div class="about center">
+
+        <h1><span class="about__name">M&E Controls Ltd</span></h1>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+        <h2>Time Logging</h2>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+        <h3 class="section__title">User Register</h3>
+        
+        
+      </div>
+
+      
+
+
+      <!-- Contact -->
+      <section class="section contact center" id="contact">
+        
+        
+        
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+        </p>
+
+       
+
+
+        <label for="fname">Enter Your Registration Details Below:</label>
+        
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+        <input type="text" id="fullName" name="fullName" maxlength = "25" placeholder="Full Name">
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+        <input type="text" id="emailInput" name="emailInput" maxlength = "25" placeholder="Email Address">
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+        <input type="password" id="passwordInput" name="passwordInput" maxlength = "25" placeholder="Password">
+        
+
+
+          
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+
+        <button id="btn1" class="btn btn--outline">submit</button>
+
+          
+          
+
+          
+          
+
+
+        
+        <div class="about__contact center">
+
+          
+        </div>
+      </div>
+
+      </section>
+    </main>
+
+    <footer class="footer">
+      
+      
+    </footer>
+
+    <div class="scroll-container">
+    <div class="scroll-top">
+      <a aria-label="Scroll up" href="#top">
+        <i aria-hidden="true" class="fas fa-arrow-up"></i>
+      </a>
+    </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
